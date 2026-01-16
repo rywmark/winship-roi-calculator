@@ -360,7 +360,14 @@ export default function WinshipRoiCalculator() {
     setGenerationError(null);
     setAnalysis(null);
 
-    const apiKey = ""; // API key injected by environment
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
+
+    if (!apiKey) {
+      setGenerationError("API key not configured. Please add VITE_GEMINI_API_KEY to your .env file.");
+      setIsGenerating(false);
+      return;
+    }
+
     const userQuery = `
       Data:
       - Company Size: ${teamSizeNum} employees
