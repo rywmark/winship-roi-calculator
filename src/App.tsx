@@ -381,10 +381,10 @@ export default function WinshipRoiCalculator() {
     setGenerationError(null);
     setAnalysis(null);
 
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
+    const apiKey = import.meta.env.GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || "";
 
     if (!apiKey) {
-      setGenerationError("API key not configured. Please add VITE_GEMINI_API_KEY to your .env file.");
+      setGenerationError("API key not configured. Please ensure GEMINI_API_KEY is configured in your environment.");
       setIsGenerating(false);
       return;
     }
