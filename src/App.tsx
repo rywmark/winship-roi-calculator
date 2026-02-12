@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, memo } from "react";
 import { 
   Users, 
   DollarSign, 
@@ -29,7 +29,7 @@ const COLORS = {
 };
 
 // Inject Google Fonts & Custom Animations
-const FontStyles = () => (
+const FontStyles = memo(() => (
   <style>{`
     @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap');
     
@@ -98,7 +98,7 @@ const FontStyles = () => (
       animation: bounce-interval 8s infinite ease-in-out;
     }
   `}</style>
-);
+));
 
 // --- Utility Functions ---
 
@@ -117,8 +117,13 @@ const formatCurrency = (value: number) => {
   });
 };
 
+// Handle bold text (**text**)
+const parseInlineStyles = (text: string) => {
+  return text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>');
+};
+
 // --- Improved Markdown Parser ---
-const MarkdownRenderer = ({ text }: { text: string }) => {
+const MarkdownRenderer = memo(({ text }: { text: string }) => {
   if (!text) return null;
 
   const lines = text.split('\n');
@@ -147,7 +152,7 @@ const MarkdownRenderer = ({ text }: { text: string }) => {
     }
     // Check for bullet points
     else if (trimmed.startsWith('* ') || trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
-      currentList.push(trimmed.replace(/^[\*\-•]\s+/, ''));
+      currentList.push(trimmed.replace(/^[*\-•]\s+/, ''));
     } 
     else {
       if (currentList.length > 0) {
@@ -186,13 +191,29 @@ const MarkdownRenderer = ({ text }: { text: string }) => {
       })}
     </div>
   );
-};
+});
 
-// Handle bold text (**text**)
-const parseInlineStyles = (text: string) => {
-  return text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>');
-};
-
+// --- Memoized Header ---
+const Header = memo(() => (
+  <header className="w-full max-w-4xl px-6 pt-16 pb-12 text-center space-y-6">
+    <div className="inline-flex items-center justify-center p-3 rounded-full bg-white shadow-sm mb-4">
+       <Zap className="w-6 h-6" style={{ color: COLORS.black }} />
+    </div>
+    <h1 className="text-5xl md:text-6xl tracking-tight leading-[0.95]" style={{ color: COLORS.black }}>
+      Stop paying smart people <br />
+      <span className="relative inline-block">
+        <span className="relative z-10">to do dumb work.</span>
+        <span
+          className="absolute bottom-1 left-0 right-0 h-4 -z-0 opacity-40 transform -rotate-1"
+          style={{ backgroundColor: COLORS.yellow }}
+        ></span>
+      </span>
+    </h1>
+    <p className="text-xl md:text-2xl font-medium max-w-2xl mx-auto opacity-80" style={{ fontFamily: 'var(--font-heading)' }}>
+      Unlock the leverage to outpace teams twice your size.
+    </p>
+  </header>
+));
 
 // --- Main Component ---
 
@@ -478,24 +499,7 @@ export default function WinshipRoiCalculator() {
       <FontStyles />
 
       {/* --- HEADER SECTION --- */}
-      <header className="w-full max-w-4xl px-6 pt-16 pb-12 text-center space-y-6">
-        <div className="inline-flex items-center justify-center p-3 rounded-full bg-white shadow-sm mb-4">
-           <Zap className="w-6 h-6" style={{ color: COLORS.black }} />
-        </div>
-        <h1 className="text-5xl md:text-6xl tracking-tight leading-[0.95]" style={{ color: COLORS.black }}>
-          Stop paying smart people <br />
-          <span className="relative inline-block">
-            <span className="relative z-10">to do dumb work.</span>
-            <span 
-              className="absolute bottom-1 left-0 right-0 h-4 -z-0 opacity-40 transform -rotate-1" 
-              style={{ backgroundColor: COLORS.yellow }}
-            ></span>
-          </span>
-        </h1>
-        <p className="text-xl md:text-2xl font-medium max-w-2xl mx-auto opacity-80" style={{ fontFamily: 'var(--font-heading)' }}>
-          Unlock the leverage to outpace teams twice your size.
-        </p>
-      </header>
+      <Header />
 
       {/* --- INPUTS SECTION (Cream Background) --- */}
       <section className="w-full max-w-2xl px-6 mb-16">
